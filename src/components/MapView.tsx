@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Polygon, Popup, useMap } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Polygon, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { useAppStore } from '../store/useAppStore';
 
@@ -23,6 +23,40 @@ const FitBounds: React.FC<{ coords: [number, number][] | null }> = ({ coords }) 
     return null;
 };
 
+// Component to show mouse position coordinates
+const MousePosition: React.FC = () => {
+    const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
+
+    useMapEvents({
+        mousemove(e) {
+            setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
+        },
+        mouseout() {
+            setPosition(null);
+        },
+    });
+
+    if (!position) return null;
+
+    return (
+        <div style={{
+            position: 'absolute',
+            bottom: '10px',
+            left: '10px',
+            background: 'rgba(30, 58, 95, 0.95)',
+            color: 'white',
+            padding: '8px 12px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+            zIndex: 1000,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        }}>
+            <strong>Lat:</strong> {position.lat.toFixed(6)} | <strong>Lng:</strong> {position.lng.toFixed(6)}
+        </div>
+    );
+};
+
 export const MapView: React.FC = () => {
     const { boundaryPolygon, miningZones, gridCells, layers } = useAppStore();
 
@@ -42,6 +76,9 @@ export const MapView: React.FC = () => {
                 attribution='Esri'
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             />
+
+            {/* Mouse Position Display */}
+            <MousePosition />
 
             {boundaryPositions && <FitBounds coords={boundaryPositions} />}
 
@@ -155,3 +192,4 @@ export const MapView: React.FC = () => {
         </MapContainer>
     );
 };
+
