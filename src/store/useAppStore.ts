@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import * as turf from '@turf/turf';
+import type { Feature, Polygon } from 'geojson';
 
 export interface Coordinate {
     lat: number;
@@ -8,7 +9,7 @@ export interface Coordinate {
 
 export interface GridCell {
     id: string;
-    polygon: turf.Feature<turf.Polygon>;
+    polygon: Feature<Polygon>;
     miningDetected: boolean;
     insideLease: boolean;
     status: 'Legal' | 'Potential Illegal' | 'No Activity';
@@ -16,7 +17,7 @@ export interface GridCell {
 
 export interface MiningZone {
     id: string;
-    polygon: turf.Feature<turf.Polygon>;
+    polygon: Feature<Polygon>;
     isLegal: boolean;
 }
 
@@ -33,8 +34,8 @@ interface AppState {
     clearCoordinates: () => void;
 
     // Boundary polygon
-    boundaryPolygon: turf.Feature<turf.Polygon> | null;
-    setBoundaryPolygon: (polygon: turf.Feature<turf.Polygon> | null) => void;
+    boundaryPolygon: Feature<Polygon> | null;
+    setBoundaryPolygon: (polygon: Feature<Polygon> | null) => void;
 
     // Analysis state
     isAnalyzing: boolean;
@@ -71,7 +72,7 @@ interface AppState {
 }
 
 const generateGridCells = (
-    boundaryPolygon: turf.Feature<turf.Polygon>,
+    boundaryPolygon: Feature<Polygon>,
     miningZones: MiningZone[]
 ): GridCell[] => {
     const bbox = turf.bbox(boundaryPolygon);
@@ -104,7 +105,7 @@ const generateGridCells = (
 
         cells.push({
             id: `GRID-${String(index + 1).padStart(4, '0')}`,
-            polygon: cell as turf.Feature<turf.Polygon>,
+            polygon: cell as Feature<Polygon>,
             miningDetected,
             insideLease,
             status,
@@ -115,7 +116,7 @@ const generateGridCells = (
 };
 
 const generateMockMiningZones = (
-    boundaryPolygon: turf.Feature<turf.Polygon>
+    boundaryPolygon: Feature<Polygon>
 ): MiningZone[] => {
     const centroid = turf.centroid(boundaryPolygon);
     const [lng, lat] = centroid.geometry.coordinates;
@@ -123,28 +124,28 @@ const generateMockMiningZones = (
     // Legal mining zone (inside boundary)
     const legalZone: MiningZone = {
         id: 'MINE-001',
-        polygon: turf.circle([lng - 0.003, lat + 0.002], 0.3, { units: 'kilometers' }) as turf.Feature<turf.Polygon>,
+        polygon: turf.circle([lng - 0.003, lat + 0.002], 0.3, { units: 'kilometers' }) as Feature<Polygon>,
         isLegal: true,
     };
 
     // Another legal zone
     const legalZone2: MiningZone = {
         id: 'MINE-002',
-        polygon: turf.circle([lng + 0.002, lat - 0.001], 0.25, { units: 'kilometers' }) as turf.Feature<turf.Polygon>,
+        polygon: turf.circle([lng + 0.002, lat - 0.001], 0.25, { units: 'kilometers' }) as Feature<Polygon>,
         isLegal: true,
     };
 
     // Illegal mining zone (outside boundary)
     const illegalZone: MiningZone = {
         id: 'MINE-003',
-        polygon: turf.circle([lng + 0.012, lat + 0.008], 0.35, { units: 'kilometers' }) as turf.Feature<turf.Polygon>,
+        polygon: turf.circle([lng + 0.012, lat + 0.008], 0.35, { units: 'kilometers' }) as Feature<Polygon>,
         isLegal: false,
     };
 
     // Another illegal zone
     const illegalZone2: MiningZone = {
         id: 'MINE-004',
-        polygon: turf.circle([lng - 0.010, lat - 0.012], 0.2, { units: 'kilometers' }) as turf.Feature<turf.Polygon>,
+        polygon: turf.circle([lng - 0.010, lat - 0.012], 0.2, { units: 'kilometers' }) as Feature<Polygon>,
         isLegal: false,
     };
 
@@ -243,3 +244,4 @@ export const useAppStore = create<AppState>((set, get) => ({
         analysisComplete: false,
     }),
 }));
+
