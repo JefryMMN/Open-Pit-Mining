@@ -556,15 +556,17 @@ body {
     left: 0;
     right: 0;
     width: 100%;
-    height: auto;
-    max-height: 60vh;
+    height: 55vh;
+    max-height: 55vh;
     border-right: none;
     border-top: 2px solid #e2e8f0;
     border-radius: 16px 16px 0 0;
-    z-index: 1000;
+    z-index: 1100;
     transform: translateY(100%);
     transition: transform 0.3s ease-in-out;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
   }
 
   .coord-panel.open {
@@ -604,8 +606,10 @@ body {
 
   .coord-input-list {
     padding: 15px;
-    max-height: calc(60vh - 50px);
+    padding-bottom: 100px;
+    flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .coord-row {
@@ -678,9 +682,23 @@ body {
     margin-bottom: 6px;
   }
 
-  /* Report Panel */
+  /* Report Panel - hide when coord panel is open */
   .report-panel {
-    height: 160px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    max-height: 50vh;
+    z-index: 1000;
+    border-radius: 12px 12px 0 0;
+    overflow-y: auto;
+  }
+
+  /* Hide report panel when coordinate panel is open */
+  .coord-panel.open~.map-container .report-panel,
+  body:has(.coord-panel.open) .report-panel {
+    display: none;
   }
 
   .report-content {

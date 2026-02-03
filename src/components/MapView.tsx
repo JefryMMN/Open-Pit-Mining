@@ -32,7 +32,7 @@ export const MapView: React.FC = () => {
 
     return (
         <MapContainer
-            center={[23.35, 85.34]}
+            center={[9.85, 76.97]}
             zoom={14}
             style={{ height: '100%', width: '100%' }}
             scrollWheelZoom={true}

@@ -38,7 +38,8 @@ const App: React.FC = () => {
         <div className="map-container">
           <MapView />
           <AnalysisSummary />
-          <ReportPanel />
+          {/* Hide report panel when mobile coord panel is open */}
+          {!(isMobile && isMobilePanelOpen) && <ReportPanel />}
 
           {/* Run Analysis Button */}
           {boundaryPolygon && !analysisComplete && (

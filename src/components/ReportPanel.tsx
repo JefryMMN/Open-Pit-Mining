@@ -1,13 +1,35 @@
 import React from 'react';
 import { FileText, Clock, Bell, User } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
+import { generatePDFReport } from '../utils/pdfGenerator';
 
 export const ReportPanel: React.FC = () => {
-    const { analysisComplete } = useAppStore();
+    const { analysisComplete, miningZones } = useAppStore();
 
     if (!analysisComplete) return null;
 
+    const illegalZones = miningZones.filter(z => !z.isLegal);
+    const legalZones = miningZones.filter(z => z.isLegal);
 
+    const handleGenerateReport = async () => {
+        const reportData = {
+            totalArea: 56.8,
+            compliantArea: 44.5,
+            illegalArea: 12.3,
+            violations: [
+                'Unauthorized Mining in Protected Zone (4.2 ha)',
+                'Expansion Beyond Lease Boundary (8.1 ha)',
+            ],
+            timestamp: new Date().toLocaleString(),
+        };
+
+        try {
+            await generatePDFReport(reportData);
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report. Please try again.');
+        }
+    };
 
     return (
         <div className="report-panel">
@@ -55,13 +77,15 @@ export const ReportPanel: React.FC = () => {
                     </div>
                     <div className="legend-row">
                         <div className="box-green"></div>
-                        <span>Compliant Area</span>
+                        <span>Compliant Area ({legalZones.length} zones)</span>
                     </div>
                     <div className="legend-row">
                         <div className="box-red"></div>
-                        <span>Illegal Mining Area</span>
+                        <span>Illegal Mining Area ({illegalZones.length} zones)</span>
                     </div>
-                    <button className="btn-blue" style={{ marginTop: '12px' }}>Generate Report</button>
+                    <button className="btn-blue" style={{ marginTop: '12px' }} onClick={handleGenerateReport}>
+                        Generate Report
+                    </button>
                 </div>
 
                 {/* Col 3: Violations */}
@@ -71,7 +95,9 @@ export const ReportPanel: React.FC = () => {
                         <div>1. Unauthorized Mining in Protected Zone (4.2 ha)</div>
                         <div>2. Expansion Beyond Lease Boundary (8.1 ha)</div>
                     </div>
-                    <button className="btn-blue" style={{ marginTop: '12px', float: 'right' }}>Generate Report</button>
+                    <button className="btn-blue" style={{ marginTop: '12px', float: 'right' }} onClick={handleGenerateReport}>
+                        Generate Report
+                    </button>
                 </div>
             </div>
         </div>
