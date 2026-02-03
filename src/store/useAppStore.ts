@@ -21,6 +21,11 @@ export interface MiningZone {
     isLegal: boolean;
 }
 
+export interface Alert {
+    message: string;
+    severity: 'info' | 'warning' | 'critical';
+}
+
 interface AppState {
     // Login state
     isLoggedIn: boolean;
@@ -60,6 +65,18 @@ interface AppState {
         illegal: boolean;
     };
     toggleLayer: (layer: keyof AppState['layers']) => void;
+
+    // Alerts
+    alerts: Alert[];
+    clearAlerts: () => void;
+
+    // Active layer (satellite/drone)
+    activeLayer: 'satellite' | 'drone';
+    setActiveLayer: (layer: 'satellite' | 'drone') => void;
+
+    // Temporal analysis
+    selectedDate: string;
+    setSelectedDate: (date: string) => void;
 
     // Plot boundary from coordinates
     plotBoundary: () => void;
@@ -194,6 +211,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     toggleLayer: (layer) => set((state) => ({
         layers: { ...state.layers, [layer]: !state.layers[layer] }
     })),
+
+    // Alerts
+    alerts: [],
+    clearAlerts: () => set({ alerts: [] }),
+
+    // Active layer
+    activeLayer: 'satellite',
+    setActiveLayer: (layer) => set({ activeLayer: layer }),
+
+    // Selected date for temporal analysis
+    selectedDate: 'current',
+    setSelectedDate: (date) => set({ selectedDate: date }),
 
     plotBoundary: () => {
         const { coordinates } = get();

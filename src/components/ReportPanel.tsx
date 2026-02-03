@@ -3,10 +3,11 @@ import { FileText, Clock, Bell, User } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 
 export const ReportPanel: React.FC = () => {
-    const { analysisComplete, miningZones } = useAppStore();
+    const { analysisComplete } = useAppStore();
 
     if (!analysisComplete) return null;
-    const isIllegal = miningZones.filter(z => !z.isLegal).length > 0;
+
+
 
     return (
         <div className="report-panel">
